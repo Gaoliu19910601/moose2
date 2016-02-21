@@ -140,6 +140,7 @@
 #include "DGFunctionDiffusionDirichletBC.h"
 #include "DGConvection.h"
 #include "DGLinearStommelMunk.h"
+#include "DGCahnHilliard.h" 
 
 // ics
 #include "ConstantIC.h"
@@ -299,6 +300,7 @@
 #include "DGDiffusion.h"
 #include "DGFunctionDiffusionDirichletBC.h"
 #include "LSMDirichletBC.h"
+#include "DGCHZeroFlux.h"
 
 // Constraints
 #include "TiedValueConstraint.h"
@@ -756,9 +758,11 @@ registerObjects(Factory & factory)
   // DG
   registerDGKernel(DGDiffusion);
   registerDGKernel(DGLinearStommelMunk);
+  registerDGKernel(DGCahnHilliard);
   registerBoundaryCondition(DGFunctionDiffusionDirichletBC);
   registerDGKernel(DGConvection);
   registerBoundaryCondition(LSMDirichletBC);
+  registerBoundaryCondition(DGCHZeroFlux);
   
   // Constraints
   registerConstraint(TiedValueConstraint);
