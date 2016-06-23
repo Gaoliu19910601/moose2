@@ -42,7 +42,7 @@ LSMDirichletBC::LSMDirichletBC(const InputParameters & parameters) :
 Real
 LSMDirichletBC::computeQpResidual()
 {
-  const unsigned int elem_b_order = static_cast<unsigned int> (_var.getOrder());
+  const unsigned int elem_b_order = static_cast<unsigned int> (_var.order());
   const double h_elem = _current_elem->volume()/_current_side_elem->volume() * 1./std::pow(elem_b_order, 2.);
 
   Real r = 0;
@@ -56,7 +56,7 @@ LSMDirichletBC::computeQpResidual()
 Real
 LSMDirichletBC::computeQpJacobian()
 {
-  const unsigned int elem_b_order = static_cast<unsigned int> (_var.getOrder());
+  const unsigned int elem_b_order = static_cast<unsigned int> (_var.order());
   const double h_elem = _current_elem->volume()/_current_side_elem->volume() * 1./std::pow(elem_b_order, 2.);
 
   Real r = 0;

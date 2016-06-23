@@ -32,7 +32,7 @@ public:
 protected:
   const VariablePhiSecond & _second_phi;
   const VariableTestSecond & _second_test;
-  VariableSecond & _second_u;
+  const VariableSecond & _second_u;
 
   Real _eps_s;
   Real _eps_m;  

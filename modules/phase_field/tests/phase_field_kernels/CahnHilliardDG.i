@@ -8,8 +8,8 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 160
-  ny = 160
+  nx = 100
+  ny = 100
   xmax = 50
   ymax = 50
   elem_type = QUAD9
@@ -60,7 +60,7 @@
   [./dg_ch]
     type = DGCahnHilliard
     variable = cv
-    eta = 10
+    eta = 0
     kappa_name = kappa_c
   [../]
 []
@@ -88,7 +88,7 @@
     type = DGCHZeroFlux
     variable = cv
     boundary = '0 1 2 3'
-    alpha = 1000
+    alpha = 0
   [../]
 []
 
@@ -104,7 +104,7 @@
   type = Transient
   scheme = 'bdf2'
 
-  solve_type = 'NEWTON'
+  solve_type = 'PJFNK'
 #  petsc_options_iname = '-pc_type -pc_hypre_type -ksp_gmres_restart'
 #  petsc_options_value = 'hypre boomeramg 31'
 
@@ -117,12 +117,20 @@
   l_max_its = 15
   l_tol = 1.0e-4
   nl_max_its = 20
-  nl_rel_tol = 1.0e-8
+  nl_rel_tol = 1.0e-5
   nl_abs_tol = 1.0e-8
 
   start_time = 0.0
   num_steps = 1000
-  dt = 1
+  dt = 0.01
+
+  [./Adaptivity]
+   initial_adaptivity = 1
+    refine_fraction = 0.4
+    coarsen_fraction = 0.2
+    max_h_level = 1
+  [../]
+
 []
 
 [Outputs]
