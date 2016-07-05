@@ -63,14 +63,14 @@ VesicleShapeDeformation::computeQpJacobian()
 
   // 2/eps*(Grad_w*Grad_w)*(3*u^2 + 2*C*eps*u -1.0)
   r += 2.0/_epsilon * (_grad_test[_i][_qp] * _grad_phi[_j][_qp]) * (3.0 * _u[_qp] * _u[_qp] + 2.0 * _flexural_rigidity * _epsilon * _u[_qp] - 1.0);
-  r += 2.0/_epsilon * (_grad_test[_i][_qp] * _grad_u[_qp]) * (6.0 * _phi[_j][_qp] * 2.0 * _flexural_rigidity * _epsilon * _phi[_j][_qp]);
+  r += 2.0/_epsilon * (_grad_test[_i][_qp] * _grad_u[_qp]) * (6.0 * _u[_qp] * _phi[_j][_qp] + 2.0 * _flexural_rigidity * _epsilon * _phi[_j][_qp]);
   
   // 1/eps*w*(6*u+2*C*eps)(Grad_u*Grad_u)
-  r += 1.0/_epsilon * _test[_i][_qp] * (6.0 * _phi[_j][_qp] + 2.0 * _flexural_rigidity * _epsilon) * (_grad_u[_qp] * _grad_u[_qp]);
+  r += 1.0/_epsilon * _test[_i][_qp] * (6.0 * _phi[_j][_qp]) * (_grad_u[_qp] * _grad_u[_qp]);
   r += 1.0/_epsilon * _test[_i][_qp] * (6.0 * _u[_qp] + 2.0 * _flexural_rigidity * _epsilon) * (2.0 * _grad_phi[_j][_qp] * _grad_u[_qp]);
 
   // 1/eps^3*w*(3*u^2+2*C*eps*u-1)(u^2-1)(u+C*eps)
-  r += pow(1.0/_epsilon, 3.0) * _test[_i][_qp] * (6.0 * _phi[_j][_qp] + 2.0 * _flexural_rigidity * _epsilon * _phi[_j][_qp]) * (_u[_qp] * _u[_qp] - 1.0) * (_u[_qp] + _flexural_rigidity * _epsilon);
+  r += pow(1.0/_epsilon, 3.0) * _test[_i][_qp] * (6.0 * _u[_qp] * _phi[_j][_qp] + 2.0 * _flexural_rigidity * _epsilon * _phi[_j][_qp]) * (_u[_qp] * _u[_qp] - 1.0) * (_u[_qp] + _flexural_rigidity * _epsilon);
   r += pow(1.0/_epsilon, 3.0) * _test[_i][_qp] * (3.0 * _u[_qp] * _u[_qp] + 2.0 * _flexural_rigidity * _epsilon * _u[_qp] - 1.0) * (2.0 * _u[_qp] * _phi[_j][_qp]) * (_u[_qp] + _flexural_rigidity * _epsilon);
   r += pow(1.0/_epsilon, 3.0) * _test[_i][_qp] * (3.0 * _u[_qp] * _u[_qp] + 2.0 * _flexural_rigidity * _epsilon * _u[_qp] - 1.0) * (_u[_qp] * _u[_qp] - 1.0) * _phi[_j][_qp];
 
