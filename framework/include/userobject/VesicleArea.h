@@ -16,6 +16,7 @@
 #define VESICLEAREA_H
 
 #include "ElementUserObject.h"
+#include "MooseVariableInterface.h"
 
 //Forward Declarations
 class VesicleArea;
@@ -23,15 +24,18 @@ class VesicleArea;
 template<>
 InputParameters validParams<VesicleArea>();
 
-class VesicleArea : public ElementUserObject
+class VesicleArea : 
+  public ElementUserObject,
+  public MooseVariableInterface
 {
 public:
-  ElementUserObject(const InputParameters & parameters);
+  VesicleArea(const InputParameters & parameters);
 
   virtual void initialize();
   virtual void execute();
   virtual void threadJoin(const UserObject & y);
-  virtual Real getValue();
+  virtual void finalize();
+  Real getValue() const;
 
 protected:
   virtual Real computeQpIntegral();

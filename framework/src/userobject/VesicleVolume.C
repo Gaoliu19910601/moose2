@@ -46,10 +46,15 @@ VesicleVolume::execute()
   _integral_value += computeIntegral();
 }
 
-Real
-VesicleVolume::getValue()
+void
+VesicleVolume::finalize()
 {
   gatherSum(_integral_value);
+}
+
+Real
+VesicleVolume::getValue() const
+{
   return _integral_value;
 }
 

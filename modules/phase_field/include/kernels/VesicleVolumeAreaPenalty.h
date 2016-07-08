@@ -16,6 +16,8 @@
 #define VESICLEVOLUMEAREAPENALTY_H
 
 #include "Kernel.h"
+#include "VesicleVolume.h"
+#include "VesicleArea.h"
 
 class VesicleVolumeAreaPenalty;
 
@@ -46,6 +48,9 @@ protected:
   const VariablePhiSecond & _second_phi;
   const VariableTestSecond & _second_test;
   const VariableSecond & _second_u;
+
+  const VesicleArea & _vesicle_area_uo;
+  const VesicleVolume & _vesicle_volume_uo;
 
 };
 

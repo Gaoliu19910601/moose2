@@ -48,10 +48,15 @@ VesicleArea::execute()
   _integral_value += computeIntegral();
 }
 
-Real
-VesicleArea::getValue()
+void
+VesicleArea::finalize()
 {
   gatherSum(_integral_value);
+}
+
+Real
+VesicleArea::getValue() const
+{
   return _integral_value;
 }
 
@@ -75,7 +80,7 @@ VesicleArea::computeIntegral()
 Real
 VesicleArea::computeQpIntegral()
 {
-  Real value = 0.5 * _epsilon * _grad_u[_qp] * _grad_u[[_qp] + 1.0/(4.0 * _epsilon) * pow((_u[_qp] * _u[_qp] - 1.0), 2.0);
+  Real value = 0.5 * _epsilon * _grad_u[_qp] * _grad_u[_qp] + 1.0/(4.0 * _epsilon) * pow((_u[_qp] * _u[_qp] - 1.0), 2.0);
   value *= 3.0/2.0/std::sqrt(2.0);
   return value;
 }
