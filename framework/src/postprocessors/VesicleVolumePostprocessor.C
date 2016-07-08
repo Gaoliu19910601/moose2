@@ -12,53 +12,34 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef VESICLEVOLUMEAREAPENALTY_H
-#define VESICLEVOLUMEAREAPENALTY_H
-
-#include "Kernel.h"
 #include "VesicleVolumePostprocessor.h"
-#include "VesicleAreaPostprocessor.h"
-
-class VesicleVolumeAreaPenalty;
 
 template<>
-InputParameters validParams<VesicleVolumeAreaPenalty>();
-
-class VesicleVolumeAreaPenalty : public Kernel
+InputParameters validParams<VesicleVolumePostprocessor>()
 {
-public:
-  VesicleVolumeAreaPenalty(const InputParameters & parameters);
+  InputParameters params = validParams<ElementIntegralPostprocessor>();
+  params.addRequiredCoupledVar("variable", "The name of the variable that this userobject applies to");
+  return params;
+}
 
-  virtual ~VesicleVolumeAreaPenalty();
+VesicleVolumePostprocessor::VesicleVolumePostprocessor(const InputParameters & parameters) :
+    ElementIntegralPostprocessor(parameters),
+    MooseVariableInterface(this, false),
+    _u(coupledValue("variable")),
+    _grad_u(coupledGradient("variable")),
+    _qp(0)
+{}
 
-protected:
+void
+VesicleVolumePostprocessor::threadJoin(const UserObject &y)
+{
+  const VesicleVolumePostprocessor & pps = static_cast<const VesicleVolumePostprocessor &>(y);
+  _integral_value += pps._integral_value;
+}
 
-  virtual void timestepSetup();
+Real
+VesicleVolumePostprocessor::computeQpIntegral()
+{
+  return 0.5 * (1.0 - _u[_qp]);
+}
 
-  virtual void jacobianSetup();
-
-  virtual void residualSetup();
-
-  virtual Real computeQpResidual();
-
-  virtual Real computeQpJacobian();
-
-  Real _alpha_v;
-
-  Real _alpha_a;
-
-  Real _epsilon;
-
-  Real _volume, _volume_0;
-  Real _area, _area_0;
-
-  const VariablePhiSecond & _second_phi;
-  const VariableTestSecond & _second_test;
-  const VariableSecond & _second_u;
-
-  const PostprocessorValue & _vesicle_area;
-  const PostprocessorValue & _vesicle_volume;
-
-};
-
-#endif /* VESICLEVOLUMEAREAPENALTY_H */

@@ -12,53 +12,36 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef VESICLEVOLUMEAREAPENALTY_H
-#define VESICLEVOLUMEAREAPENALTY_H
+#ifndef VESICLEAREAPOSTPROCESSOR_H
+#define VESICLEAREAPOSTPROCESSOR_H
 
-#include "Kernel.h"
-#include "VesicleVolumePostprocessor.h"
-#include "VesicleAreaPostprocessor.h"
+#include "ElementIntegralPostprocessor.h"
+#include "MooseVariableInterface.h"
 
-class VesicleVolumeAreaPenalty;
+//Forward Declarations
+class VesicleAreaPostprocessor;
 
 template<>
-InputParameters validParams<VesicleVolumeAreaPenalty>();
+InputParameters validParams<VesicleAreaPostprocessor>();
 
-class VesicleVolumeAreaPenalty : public Kernel
+class VesicleAreaPostprocessor : 
+  public ElementIntegralPostprocessor,
+  public MooseVariableInterface
 {
 public:
-  VesicleVolumeAreaPenalty(const InputParameters & parameters);
-
-  virtual ~VesicleVolumeAreaPenalty();
+  VesicleAreaPostprocessor(const InputParameters & parameters);
+  virtual void threadJoin(const UserObject & y);
 
 protected:
-
-  virtual void timestepSetup();
-
-  virtual void jacobianSetup();
-
-  virtual void residualSetup();
-
-  virtual Real computeQpResidual();
-
-  virtual Real computeQpJacobian();
-
-  Real _alpha_v;
-
-  Real _alpha_a;
-
+  virtual Real computeQpIntegral();
+  /// Holds the solution at current quadrature points
+  const VariableValue & _u;
+  /// Holds the solution gradient at the current quadrature points
+  const VariableGradient & _grad_u;
+  
   Real _epsilon;
 
-  Real _volume, _volume_0;
-  Real _area, _area_0;
-
-  const VariablePhiSecond & _second_phi;
-  const VariableTestSecond & _second_test;
-  const VariableSecond & _second_u;
-
-  const PostprocessorValue & _vesicle_area;
-  const PostprocessorValue & _vesicle_volume;
-
+  unsigned int _qp;
 };
 
-#endif /* VESICLEVOLUMEAREAPENALTY_H */
+#endif

@@ -244,6 +244,8 @@
 #include "AxisymmetricCenterlineAverageValue.h"
 #include "VariableInnerProduct.h"
 #include "VariableResidual.h"
+#include "VesicleVolumePostprocessor.h"
+#include "VesicleAreaPostprocessor.h"
 
 // vector PPS
 #include "CSVReader.h"
@@ -708,6 +710,8 @@ registerObjects(Factory & factory)
   registerPostprocessor(AxisymmetricCenterlineAverageValue);
   registerPostprocessor(VariableInnerProduct);
   registerPostprocessor(VariableResidual);
+  registerPostprocessor(VesicleAreaPostprocessor);
+  registerPostprocessor(VesicleVolumePostprocessor);
 
   // vector PPS
   registerVectorPostprocessor(CSVReader);

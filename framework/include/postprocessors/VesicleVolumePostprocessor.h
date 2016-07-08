@@ -12,34 +12,34 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef VESICLESHAPEDEFORMATION_H
-#define VESICLESHAPEDEFORMATION_H
+#ifndef VESICLEVOLUMEPOSTPROCESSOR_H
+#define VESICLEVOLUMEPOSTPROCESSOR_H
 
-#include "Kernel.h"
+#include "ElementIntegralPostprocessor.h"
+#include "MooseVariableInterface.h"
 
-class VesicleShapeDeformation;
+//Forward Declarations
+class VesicleVolumePostprocessor;
 
 template<>
-InputParameters validParams<VesicleShapeDeformation>();
+InputParameters validParams<VesicleVolumePostprocessor>();
 
-class VesicleShapeDeformation : public Kernel
+class VesicleVolumePostprocessor : 
+  public ElementIntegralPostprocessor,
+  public MooseVariableInterface
 {
 public:
-  VesicleShapeDeformation(const InputParameters & parameters);
-
-  virtual ~VesicleShapeDeformation();
+  VesicleVolumePostprocessor(const InputParameters & parameters);
+  virtual void threadJoin(const UserObject & y);
 
 protected:
-  virtual Real computeQpResidual();
-
-  virtual Real computeQpJacobian();
-
-  Real _epsilon;
-  Real _C;
- 
-  const VariablePhiSecond & _second_phi;
-  const VariableTestSecond & _second_test;
-  const VariableSecond & _second_u;
+  virtual Real computeQpIntegral();
+  /// Holds the solution at current quadrature points
+  const VariableValue & _u;
+  /// Holds the solution gradient at the current quadrature points
+  const VariableGradient & _grad_u;
+  
+  unsigned int _qp;
 };
 
-#endif /* VESICLESHAPEDEFORMATION_H */
+#endif
