@@ -28,8 +28,8 @@ VesicleShapeDeformation::VesicleShapeDeformation(const InputParameters & paramet
     Kernel(parameters),
     _epsilon(getParam<Real>("epsilon")),
     _flexural_rigidity(getParam<Real>("flexural_rigidity")),
-    _second_phi(secondPhiFace()),
-    _second_test(secondTestFace()),
+    _second_phi(secondPhi()),
+    _second_test(secondTest()),
     _second_u(second())
 {
 }

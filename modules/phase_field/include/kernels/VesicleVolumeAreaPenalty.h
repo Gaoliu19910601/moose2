@@ -32,6 +32,13 @@ public:
   virtual ~VesicleVolumeAreaPenalty();
 
 protected:
+
+  virtual void timestepSetup();
+
+  virtual void jacobianSetup();
+
+  virtual void residualSetup();
+
   virtual Real computeQpResidual();
 
   virtual Real computeQpJacobian();

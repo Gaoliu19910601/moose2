@@ -4,8 +4,8 @@
 /*          All contents are licensed under LGPL V2.1           */
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
-#ifndef THUMBIC_H
-#define THUMBIC_H
+#ifndef VESICLEIC_H
+#define VESICLEIC_H
 
 #include "Kernel.h"
 #include "InitialCondition.h"

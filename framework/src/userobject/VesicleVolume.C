@@ -21,6 +21,7 @@ template<>
 InputParameters validParams<VesicleVolume>()
 {
   InputParameters params = validParams<ElementUserObject>();
+  params.addRequiredParam<PostprocessorName>("mesh_volume", "Postprocessor from which to get mesh volume");
   params.addRequiredCoupledVar("variable", "The name of the variable that this userobject applies to");
   return params;
 }
@@ -28,6 +29,7 @@ InputParameters validParams<VesicleVolume>()
 VesicleVolume::VesicleVolume(const InputParameters & parameters) :
     ElementUserObject(parameters),
     MooseVariableInterface(this, false),
+    _mesh_volume(getPostprocessorValue("mesh_volume")),
     _u(coupledValue("variable")),
     _grad_u(coupledGradient("variable")),
     _qp(0),
@@ -78,6 +80,6 @@ VesicleVolume::computeIntegral()
 Real
 VesicleVolume::computeQpIntegral()
 {
-  Real value = _u[_qp];
+  Real value = 0.5 * (1.0 - _u[_qp]);
   return value;
 }

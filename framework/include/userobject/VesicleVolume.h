@@ -41,6 +41,8 @@ protected:
   virtual Real computeQpIntegral();
   virtual Real computeIntegral();
 
+  const PostprocessorValue & _mesh_volume;
+
   /// Holds the solution at current quadrature points
   const VariableValue & _u;
   /// Holds the solution gradient at the current quadrature points
@@ -49,6 +51,7 @@ protected:
   unsigned int _qp;
 
   Real _integral_value;
+ 
 };
 
 #endif

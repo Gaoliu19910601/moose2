@@ -141,6 +141,7 @@
 #include "DGConvection.h"
 #include "DGLinearStommelMunk.h"
 #include "DGCahnHilliard.h" 
+#include "DGVesicleShapeDeformation.h"
 
 // ics
 #include "ConstantIC.h"
@@ -277,6 +278,8 @@
 #include "NodalNormalsCorner.h"
 #include "NodalNormalsPreprocessor.h"
 #include "SolutionUserObject.h"
+#include "VesicleArea.h"
+#include "VesicleVolume.h"
 #ifdef LIBMESH_HAVE_FPARSER
 #include "Terminator.h"
 #endif
@@ -739,6 +742,8 @@ registerObjects(Factory & factory)
   registerUserObject(NodalNormalsCorner);
   registerUserObject(NodalNormalsEvaluator);
   registerUserObject(SolutionUserObject);
+  registerUserObject(VesicleArea);
+  registerUserObject(VesicleVolume);
 #ifdef LIBMESH_HAVE_FPARSER
   registerUserObject(Terminator);
 #endif
@@ -759,6 +764,7 @@ registerObjects(Factory & factory)
   registerDGKernel(DGDiffusion);
   registerDGKernel(DGLinearStommelMunk);
   registerDGKernel(DGCahnHilliard);
+  registerDGKernel(DGVesicleShapeDeformation);
   registerBoundaryCondition(DGFunctionDiffusionDirichletBC);
   registerDGKernel(DGConvection);
   registerBoundaryCondition(LSMDirichletBC);

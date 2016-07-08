@@ -33,6 +33,7 @@ public:
 
 protected:
   Real _eta;
+  Real _epsilon;
 
   const VariablePhiSecond & _second_phi;
   const VariableTestSecond & _second_test;

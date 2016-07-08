@@ -26,7 +26,7 @@ VesicleIC::value(const Point & p)
 {
   Real value = 0.0;
 
-  value = pow((p - _center).norm_sq(),0.5);
+  value = pow((p - _center).norm_sq(),0.5) - 0.25;
 
   value = std::tanh(value/sqrt(2.0)/_epsilon);
 

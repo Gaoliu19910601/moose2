@@ -22,12 +22,14 @@ InputParameters validParams<DGVesicleShapeDeformation>()
 {
   InputParameters params = validParams<DGKernel>();
   params.addParam<Real>("eta", 100, "The stablization parameter in DG kernel");
+  params.addParam<Real>("epsilon", 0.01, "The interfacial penalty parameter.");
   return params;
 }
 
 DGVesicleShapeDeformation::DGVesicleShapeDeformation(const InputParameters & parameters) :
     DGKernel(parameters),
     _eta(getParam<Real>("eta")),
+    _epsilon(getParam<Real>("epsilon")),
     _second_phi(secondPhiFace()),
     _second_test(secondTestFace()),
     _second_u(second()),
@@ -59,6 +61,8 @@ DGVesicleShapeDeformation::computeQpResidual(Moose::DGResidualType type)
     r += _eta / h_elem * (_grad_u[_qp] * _normals[_qp] - _grad_u_neighbor[_qp] * _normals[_qp]) * (-_grad_test_neighbor[_i][_qp] * _normals[_qp]);
     break;
   }
+
+  r *= _epsilon;
 
   return r;
 }
@@ -98,6 +102,8 @@ DGVesicleShapeDeformation::computeQpJacobian(Moose::DGJacobianType type)
     r += _eta / h_elem * (-_grad_phi_neighbor[_j][_qp] * _normals[_qp]) * (-_grad_test_neighbor[_i][_qp] * _normals[_qp]);
     break;
   }
+
+  r *= _epsilon;
 
   return r;
 }
