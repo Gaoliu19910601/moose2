@@ -47,7 +47,7 @@ VesicleVolumeAreaPenalty::~VesicleVolumeAreaPenalty()
 void
 VesicleVolumeAreaPenalty::timestepSetup()
 {
-  if (_t_step == 1)
+  if (_t_step <= 2)
   {
     _volume_0 = _vesicle_volume;
     _area_0 = _vesicle_area;
@@ -74,9 +74,11 @@ VesicleVolumeAreaPenalty::computeQpResidual()
 {
   Real r = 0;
 
+  Real rz_coord = _q_point[_qp](0);
+
   r += -_alpha_v * _test[_i][_qp] * (_volume - _volume_0);
 
-  r += _alpha_a * _test[_i][_qp] * (_area - _area_0) * (-3.0/std::sqrt(2.0) * _epsilon * _second_u[_qp].tr());
+  r += _alpha_a * _test[_i][_qp] * (_area - _area_0) * (-3.0/std::sqrt(2.0) * _epsilon * (_second_u[_qp].tr() + _grad_u[_qp](0)/rz_coord));
 
   return r;
 }
@@ -86,7 +88,9 @@ VesicleVolumeAreaPenalty::computeQpJacobian()
 {
   Real r = 0;
 
-  r += _alpha_a * _test[_i][_qp] * (_area - _area_0) * (-3.0/std::sqrt(2.0) * _epsilon * _second_phi[_qp][_j].tr());
+  Real rz_coord = _q_point[_qp](0);
+
+  r += _alpha_a * _test[_i][_qp] * (_area - _area_0) * (-3.0/std::sqrt(2.0) * _epsilon * (_second_phi[_j][_qp].tr() + _grad_phi[_j][_qp](0)/rz_coord));
 
   return r;
 }

@@ -47,17 +47,19 @@ DGVesicleShapeDeformation::computeQpResidual(Moose::DGResidualType type)
   const unsigned int elem_b_order = static_cast<unsigned int> (_var.order());
   const double h_elem = _current_elem->volume()/_current_side_elem->volume() * 1./std::pow(elem_b_order, 2.);
 
+  Real rz_coord = _q_point[_qp](0);
+
   switch (type)
   {
   case Moose::Element:
-    r += -0.5 * (_second_u[_qp].tr() + _second_u_neighbor[_qp].tr()) * (_grad_test[_i][_qp] * _normals[_qp]);
-    r += -(_grad_u[_qp] * _normals[_qp] - _grad_u_neighbor[_qp] * _normals[_qp]) * 0.5 * (_second_test[_i][_qp].tr()); 
+    r += -0.5 * ((_second_u[_qp].tr() + _grad_u[_qp](0)/rz_coord) + (_second_u_neighbor[_qp].tr() + _grad_u_neighbor[_qp](0)/rz_coord)) * (_grad_test[_i][_qp] * _normals[_qp]);
+    r += -(_grad_u[_qp] * _normals[_qp] - _grad_u_neighbor[_qp] * _normals[_qp]) * 0.5 * ((_second_test[_i][_qp].tr() + _grad_test[_i][_qp](0)/rz_coord)); 
     r += _eta / h_elem * (_grad_u[_qp] * _normals[_qp] - _grad_u_neighbor[_qp] * _normals[_qp]) * (_grad_test[_i][_qp] * _normals[_qp]);
     break;
 
   case Moose::Neighbor:
-    r += -0.5 * (_second_u[_qp].tr() + _second_u_neighbor[_qp].tr()) * (-_grad_test_neighbor[_i][_qp] * _normals[_qp]);
-    r += -(_grad_u[_qp] * _normals[_qp] - _grad_u_neighbor[_qp] * _normals[_qp]) * 0.5 * (_second_test_neighbor[_i][_qp].tr());
+    r += -0.5 * ((_second_u[_qp].tr() + _grad_u[_qp](0)/rz_coord) + (_second_u_neighbor[_qp].tr() + _grad_u_neighbor[_qp](0)/rz_coord)) * (-_grad_test_neighbor[_i][_qp] * _normals[_qp]);
+    r += -(_grad_u[_qp] * _normals[_qp] - _grad_u_neighbor[_qp] * _normals[_qp]) * 0.5 * ((_second_test_neighbor[_i][_qp].tr() + _grad_test_neighbor[_i][_qp](0)/rz_coord));
     r += _eta / h_elem * (_grad_u[_qp] * _normals[_qp] - _grad_u_neighbor[_qp] * _normals[_qp]) * (-_grad_test_neighbor[_i][_qp] * _normals[_qp]);
     break;
   }
@@ -75,30 +77,32 @@ DGVesicleShapeDeformation::computeQpJacobian(Moose::DGJacobianType type)
   const unsigned int elem_b_order = static_cast<unsigned int> (_var.order());
   const double h_elem = _current_elem->volume()/_current_side_elem->volume() * 1./std::pow(elem_b_order, 2.);
 
+  Real rz_coord = _q_point[_qp](0);
+
   switch (type)
   {
 
   case Moose::ElementElement:
-    r += -0.5 * (_second_phi[_j][_qp].tr() * _grad_test[_i][_qp] * _normals[_qp]);
-    r += -_grad_phi[_j][_qp] * _normals[_qp] * 0.5 * _second_test[_i][_qp].tr();
+    r += -0.5 * ((_second_phi[_j][_qp].tr() + _grad_phi[_j][_qp](0)/rz_coord) * _grad_test[_i][_qp] * _normals[_qp]);
+    r += -_grad_phi[_j][_qp] * _normals[_qp] * 0.5 * (_second_test[_i][_qp].tr() + _grad_test[_i][_qp](0)/rz_coord);
     r += _eta / h_elem * (_grad_phi[_j][_qp] * _normals[_qp]) * (_grad_test[_i][_qp] * _normals[_qp]);
     break;
 
   case Moose::ElementNeighbor:
-    r += -0.5 * (_second_phi_neighbor[_j][_qp].tr() * _grad_test[_i][_qp] * _normals[_qp]);
-    r += -(-_grad_phi_neighbor[_j][_qp]) * _normals[_qp] * 0.5 * _second_test[_i][_qp].tr();
+    r += -0.5 * ((_second_phi_neighbor[_j][_qp].tr() + _grad_phi_neighbor[_j][_qp](0)/rz_coord) * _grad_phi[_i][_qp] * _normals[_qp]);
+    r += -(-_grad_phi_neighbor[_j][_qp]) * _normals[_qp] * 0.5 * (_second_test[_i][_qp].tr() + _grad_test[_i][_qp](0)/rz_coord);
     r += _eta / h_elem * (-_grad_phi_neighbor[_j][_qp] * _normals[_qp]) * (_grad_test[_i][_qp] * _normals[_qp]);
     break;
 
   case Moose::NeighborElement:
-    r += -0.5 * (_second_phi[_j][_qp].tr() * (-_grad_test_neighbor[_i][_qp]) * _normals[_qp]);
-    r += -_grad_phi[_j][_qp] * _normals[_qp] * 0.5 * _second_test_neighbor[_i][_qp].tr();
+    r += -0.5 * ((_second_phi[_j][_qp].tr() + _grad_phi[_j][_qp](0)/rz_coord) * (-_grad_test_neighbor[_i][_qp]) * _normals[_qp]);
+    r += -_grad_phi[_j][_qp] * _normals[_qp] * 0.5 * (_second_test_neighbor[_i][_qp].tr() + _grad_test_neighbor[_i][_qp](0)/rz_coord);
     r += _eta / h_elem * (_grad_phi[_j][_qp] * _normals[_qp]) * (-_grad_test_neighbor[_i][_qp] * _normals[_qp]);
     break;
 
   case Moose::NeighborNeighbor:
-    r += -0.5 * (_second_phi_neighbor[_j][_qp].tr() * (-_grad_test_neighbor[_i][_qp]) * _normals[_qp]);
-    r += -(-_grad_phi_neighbor[_j][_qp]) * _normals[_qp] * 0.5 * _second_test_neighbor[_i][_qp].tr();
+    r += -0.5 * ((_second_phi_neighbor[_j][_qp].tr() + _grad_phi_neighbor[_j][_qp](0)/rz_coord) * (-_grad_test_neighbor[_i][_qp]) * _normals[_qp]);
+    r += -(-_grad_phi_neighbor[_j][_qp]) * _normals[_qp] * 0.5 * (_second_test_neighbor[_i][_qp].tr() + _grad_test_neighbor[_i][_qp](0)/rz_coord);
     r += _eta / h_elem * (-_grad_phi_neighbor[_j][_qp] * _normals[_qp]) * (-_grad_test_neighbor[_i][_qp] * _normals[_qp]);
     break;
   }

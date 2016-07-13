@@ -43,7 +43,9 @@ VesicleShapeDeformation::computeQpResidual()
 {
   Real r = 0;
 
-  r += _epsilon * (_second_test[_i][_qp].tr() * _second_u[_qp].tr()); // eps*Lap_w*Lap_u
+  Real rz_coord = _q_point[_qp](0);
+
+  r += _epsilon * ((_second_test[_i][_qp].tr() + _grad_test[_i][_qp](0)/rz_coord) * (_second_u[_qp].tr() + _grad_u[_qp](0)/rz_coord)); // eps*Lap_w*Lap_u
 
   r += 2.0/_epsilon * (_grad_test[_i][_qp] * _grad_u[_qp]) * (3.0 * _u[_qp] * _u[_qp] + 2.0 * _C * _epsilon * _u[_qp] - 1.0); // 2/eps*(Grad_w*Grad_w)*(3*u^2 + 2*C*eps*u -1.0)
 
@@ -58,8 +60,11 @@ Real
 VesicleShapeDeformation::computeQpJacobian()
 {
   Real r = 0;
+
+  Real rz_coord = _q_point[_qp](0);
+
   // eps*Lap_w*Lap_u
-  r += _epsilon * _second_test[_i][_qp].tr() * _second_phi[_j][_qp].tr();
+  r += _epsilon * (_second_test[_i][_qp].tr() + _grad_test[_i][_qp](0)/rz_coord) * (_second_phi[_j][_qp].tr() + _grad_phi[_j][_qp](0)/rz_coord);
 
   // 2/eps*(Grad_w*Grad_w)*(3*u^2 + 2*C*eps*u -1.0)
   r += 2.0/_epsilon * (_grad_test[_i][_qp] * _grad_phi[_j][_qp]) * (3.0 * _u[_qp] * _u[_qp] + 2.0 * _C * _epsilon * _u[_qp] - 1.0);
@@ -76,4 +81,3 @@ VesicleShapeDeformation::computeQpJacobian()
 
   return r;
 }
-
