@@ -18,6 +18,7 @@
 #include "Kernel.h"
 #include "VesicleVolumePostprocessor.h"
 #include "VesicleAreaPostprocessor.h"
+#include "VesicleInitialAreaVolumeUO.h"
 
 class VesicleVolumeAreaPenalty;
 
@@ -58,6 +59,8 @@ protected:
 
   const PostprocessorValue & _vesicle_area;
   const PostprocessorValue & _vesicle_volume;
+
+  //const VesicleInitialAreaVolumeUO & _uo_initial_area_volume;
 
 };
 

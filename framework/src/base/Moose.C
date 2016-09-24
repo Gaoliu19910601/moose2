@@ -246,6 +246,7 @@
 #include "VariableResidual.h"
 #include "VesicleVolumePostprocessor.h"
 #include "VesicleAreaPostprocessor.h"
+#include "VesicleTotalEnergyPostprocessor.h"
 
 // vector PPS
 #include "CSVReader.h"
@@ -282,6 +283,7 @@
 #include "SolutionUserObject.h"
 #include "VesicleArea.h"
 #include "VesicleVolume.h"
+#include "VesicleInitialAreaVolumeUO.h"
 #ifdef LIBMESH_HAVE_FPARSER
 #include "Terminator.h"
 #endif
@@ -712,6 +714,7 @@ registerObjects(Factory & factory)
   registerPostprocessor(VariableResidual);
   registerPostprocessor(VesicleAreaPostprocessor);
   registerPostprocessor(VesicleVolumePostprocessor);
+  registerPostprocessor(VesicleTotalEnergyPostprocessor);
 
   // vector PPS
   registerVectorPostprocessor(CSVReader);
@@ -748,6 +751,7 @@ registerObjects(Factory & factory)
   registerUserObject(SolutionUserObject);
   registerUserObject(VesicleArea);
   registerUserObject(VesicleVolume);
+  registerUserObject(VesicleInitialAreaVolumeUO);
 #ifdef LIBMESH_HAVE_FPARSER
   registerUserObject(Terminator);
 #endif
