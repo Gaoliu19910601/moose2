@@ -24,6 +24,10 @@ InputParameters validParams<VesicleVolumeAreaPenalty>()
   params.addParam<Real>("epsilon", 0.01, "The interfacial penalty parameter.");
   params.addRequiredParam<PostprocessorName>("vesicle_volume", "Name of vesicle volume user object.");
   params.addRequiredParam<PostprocessorName>("vesicle_area", "Name of vesicle area user object.");
+  params.addParam<bool>("use_prescribed_volume", false, "Use prescribed volume.");
+  params.addParam<bool>("use_prescribed_area", false, "Use prescribed area.");
+  params.addParam<Real>("prescribed_volume", 0.0, "Prescribed volume.");
+  params.addParam<Real>("prescribed_area", 0.0, "Prescribed area.");
   return params;
 }
 
@@ -36,8 +40,14 @@ VesicleVolumeAreaPenalty::VesicleVolumeAreaPenalty(const InputParameters & param
     _second_test(secondTest()),
     _second_u(second()),
     _vesicle_area(getPostprocessorValue("vesicle_area")),
-    _vesicle_volume(getPostprocessorValue("vesicle_volume"))
+    _vesicle_volume(getPostprocessorValue("vesicle_volume")),
+    _use_prescribed_volume(getParam<bool>("use_prescribed_volume")),
+    _use_prescribed_area(getParam<bool>("use_prescribed_area")),
+    _prescribed_volume(getParam<Real>("prescribed_volume")),
+    _prescribed_area(getParam<Real>("prescribed_area"))
 {
+  _alpha_v0 = _alpha_v;
+  _alpha_a0 = _alpha_a;
 }
 
 VesicleVolumeAreaPenalty::~VesicleVolumeAreaPenalty()
@@ -51,6 +61,24 @@ VesicleVolumeAreaPenalty::timestepSetup()
   {
     _volume_0 = _vesicle_volume;
     _area_0 = _vesicle_area;
+  }
+  
+  if(_use_prescribed_volume)
+  {
+    _volume_0 = _prescribed_volume;
+    if (_t_step <= 500)
+      _alpha_v = _alpha_v0/500 * _t_step;
+    else
+      _alpha_v = _alpha_v0;
+  }
+
+  if(_use_prescribed_area)
+  {
+    _area_0 = _prescribed_area;
+    if (_t_step <= 500)
+      _alpha_a = _alpha_a0/500 * _t_step;
+    else
+      _alpha_a = _alpha_a0;
   }
 }
 

@@ -60,6 +60,15 @@ protected:
   const PostprocessorValue & _vesicle_area;
   const PostprocessorValue & _vesicle_volume;
 
+  bool _use_prescribed_volume;
+  bool _use_prescribed_area;
+
+  Real _prescribed_volume;
+  Real _prescribed_area;
+
+  Real _alpha_v0;
+  Real _alpha_a0;
+
   //const VesicleInitialAreaVolumeUO & _uo_initial_area_volume;
 
 };
