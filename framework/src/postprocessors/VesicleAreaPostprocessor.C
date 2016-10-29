@@ -42,7 +42,8 @@ VesicleAreaPostprocessor::threadJoin(const UserObject &y)
 Real
 VesicleAreaPostprocessor::computeQpIntegral()
 {
-  Real value = 0.5 * _epsilon * _grad_u[_qp] * _grad_u[_qp] + 1.0/(4.0 * _epsilon) * pow((_u[_qp] * _u[_qp] - 1.0), 2.0);
+  //Real value = 0.5 * _epsilon * _grad_u[_qp] * _grad_u[_qp] + 1.0/(4.0 * _epsilon) * pow((_u[_qp] * _u[_qp] - 1.0), 2.0);
+  Real value = _epsilon * _grad_u[_qp] * _grad_u[_qp];
   value *= 3.0/2.0/std::sqrt(2.0);
   return value;
 }

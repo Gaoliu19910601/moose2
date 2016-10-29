@@ -78,6 +78,8 @@
 #include "MaterialDerivativeTestKernel.h"
 #include "MaterialDerivativeRankTwoTestKernel.h"
 #include "MaterialDerivativeRankFourTestKernel.h"
+#include "VesicleVolumeConstraint.h"
+#include "VesicleAreaConstraint.h"
 
 // bcs
 #include "ConvectiveFluxBC.h"
@@ -287,6 +289,8 @@
 #ifdef LIBMESH_HAVE_FPARSER
 #include "Terminator.h"
 #endif
+#include "VesicleVolumeConstraintUserObject.h"
+#include "VesicleAreaConstraintUserObject.h"
 
 // preconditioners
 #include "PhysicsBasedPreconditioner.h"
@@ -552,6 +556,8 @@ registerObjects(Factory & factory)
   registerKernel(MaterialDerivativeTestKernel);
   registerKernel(MaterialDerivativeRankTwoTestKernel);
   registerKernel(MaterialDerivativeRankFourTestKernel);
+  registerKernel(VesicleVolumeConstraint);
+  registerKernel(VesicleAreaConstraint);
 
   // bcs
   registerBoundaryCondition(ConvectiveFluxBC);
@@ -755,6 +761,8 @@ registerObjects(Factory & factory)
 #ifdef LIBMESH_HAVE_FPARSER
   registerUserObject(Terminator);
 #endif
+  registerUserObject(VesicleVolumeConstraintUserObject);
+  registerUserObject(VesicleAreaConstraintUserObject);
 
   // preconditioners
   registerNamedPreconditioner(PhysicsBasedPreconditioner, "PBP");

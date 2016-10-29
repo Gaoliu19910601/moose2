@@ -69,6 +69,8 @@ protected:
   Real _alpha_v0;
   Real _alpha_a0;
 
+  bool _use_nonlocal_constraint;
+
   //const VesicleInitialAreaVolumeUO & _uo_initial_area_volume;
 
 };

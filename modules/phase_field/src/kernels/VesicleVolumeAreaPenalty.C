@@ -28,6 +28,7 @@ InputParameters validParams<VesicleVolumeAreaPenalty>()
   params.addParam<bool>("use_prescribed_area", false, "Use prescribed area.");
   params.addParam<Real>("prescribed_volume", 0.0, "Prescribed volume.");
   params.addParam<Real>("prescribed_area", 0.0, "Prescribed area.");
+  params.addParam<bool>("use_nonlocal_constraint", false, "Use non-local constraint.");
   return params;
 }
 
@@ -44,7 +45,8 @@ VesicleVolumeAreaPenalty::VesicleVolumeAreaPenalty(const InputParameters & param
     _use_prescribed_volume(getParam<bool>("use_prescribed_volume")),
     _use_prescribed_area(getParam<bool>("use_prescribed_area")),
     _prescribed_volume(getParam<Real>("prescribed_volume")),
-    _prescribed_area(getParam<Real>("prescribed_area"))
+    _prescribed_area(getParam<Real>("prescribed_area")),
+    _use_nonlocal_constraint(getParam<bool>("use_nonlocal_constraint"))
 {
   _alpha_v0 = _alpha_v;
   _alpha_a0 = _alpha_a;
@@ -104,9 +106,18 @@ VesicleVolumeAreaPenalty::computeQpResidual()
 
   Real rz_coord = _q_point[_qp](0);
 
-  r += -_alpha_v * _test[_i][_qp] * (_volume - _volume_0);
+  if (!_use_nonlocal_constraint)
+  {
+    r += -_alpha_v * _test[_i][_qp] * (_volume - _volume_0);
 
-  r += _alpha_a * _test[_i][_qp] * (_area - _area_0) * (-3.0/std::sqrt(2.0) * _epsilon * (_second_u[_qp].tr() + _grad_u[_qp](0)/rz_coord));
+    r += _alpha_a * _test[_i][_qp] * (_area - _area_0) * (-3.0/std::sqrt(2.0) * _epsilon * (_second_u[_qp].tr() + _grad_u[_qp](0)/rz_coord));
+  }
+  else
+  {
+    r += -_alpha_v * _test[_i][_qp] * (- _volume_0);
+
+    r += _alpha_a * _test[_i][_qp] * (- _area_0) * (-3.0/std::sqrt(2.0) * _epsilon * (_second_u[_qp].tr() + _grad_u[_qp](0)/rz_coord));
+  }
 
   return r;
 }
