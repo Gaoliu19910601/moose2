@@ -18,15 +18,14 @@
 #include "ElementIntegralPostprocessor.h"
 #include "MooseVariableInterface.h"
 
-//Forward Declarations
+// Forward Declarations
 class VesicleTotalEnergyPostprocessor;
 
-template<>
+template <>
 InputParameters validParams<VesicleTotalEnergyPostprocessor>();
 
-class VesicleTotalEnergyPostprocessor : 
-  public ElementIntegralPostprocessor,
-  public MooseVariableInterface
+class VesicleTotalEnergyPostprocessor : public ElementIntegralPostprocessor,
+                                        public MooseVariableInterface
 {
 public:
   VesicleTotalEnergyPostprocessor(const InputParameters & parameters);
@@ -38,11 +37,12 @@ protected:
   const VariableValue & _u;
   /// Holds the solution gradient at the current quadrature points
   const VariableGradient & _grad_u;
- 
+
   const VariableSecond & _second_u;
 
   Real _C;
   Real _epsilon;
+  bool _rz;
 
   unsigned int _qp;
 };

@@ -17,24 +17,28 @@
 // libmesh includes
 #include "libmesh/quadrature.h"
 
-template<>
-InputParameters validParams<VesicleVolume>()
+template <>
+InputParameters
+validParams<VesicleVolume>()
 {
   InputParameters params = validParams<ElementUserObject>();
-  params.addRequiredParam<PostprocessorName>("mesh_volume", "Postprocessor from which to get mesh volume");
-  params.addRequiredCoupledVar("variable", "The name of the variable that this userobject applies to");
+  params.addRequiredParam<PostprocessorName>("mesh_volume",
+                                             "Postprocessor from which to get mesh volume");
+  params.addRequiredCoupledVar("variable",
+                               "The name of the variable that this userobject applies to");
   return params;
 }
 
-VesicleVolume::VesicleVolume(const InputParameters & parameters) :
-    ElementUserObject(parameters),
+VesicleVolume::VesicleVolume(const InputParameters & parameters)
+  : ElementUserObject(parameters),
     MooseVariableInterface(this, false),
     _mesh_volume(getPostprocessorValue("mesh_volume")),
     _u(coupledValue("variable")),
     _grad_u(coupledGradient("variable")),
     _qp(0),
     _integral_value(0)
-{}
+{
+}
 
 void
 VesicleVolume::initialize()
@@ -72,8 +76,8 @@ VesicleVolume::computeIntegral()
 {
   Real sum = 0;
 
-  for (_qp=0; _qp<_qrule->n_points(); _qp++)
-    sum += _JxW[_qp]*_coord[_qp]*computeQpIntegral();
+  for (_qp = 0; _qp < _qrule->n_points(); _qp++)
+    sum += _JxW[_qp] * _coord[_qp] * computeQpIntegral();
   return sum;
 }
 

@@ -14,15 +14,17 @@
 
 #include "VesicleVolumeAreaPenalty.h"
 
-
-template<>
-InputParameters validParams<VesicleVolumeAreaPenalty>()
+template <>
+InputParameters
+validParams<VesicleVolumeAreaPenalty>()
 {
   InputParameters params = validParams<Kernel>();
   params.addParam<Real>("alpha_v", 1000, "The penalty parameter of vesicle volume.");
-  params.addParam<Real>("alpha_a", 1000, "The penalty parameter of vesicle area."); 
+  params.addParam<Real>("alpha_a", 1000, "The penalty parameter of vesicle area.");
   params.addParam<Real>("epsilon", 0.01, "The interfacial penalty parameter.");
-  params.addRequiredParam<PostprocessorName>("vesicle_volume", "Name of vesicle volume user object.");
+  params.addParam<bool>("rz", false, "The RZ coordindate system.");
+  params.addRequiredParam<PostprocessorName>("vesicle_volume",
+                                             "Name of vesicle volume user object.");
   params.addRequiredParam<PostprocessorName>("vesicle_area", "Name of vesicle area user object.");
   params.addParam<bool>("use_prescribed_volume", false, "Use prescribed volume.");
   params.addParam<bool>("use_prescribed_area", false, "Use prescribed area.");
@@ -32,11 +34,12 @@ InputParameters validParams<VesicleVolumeAreaPenalty>()
   return params;
 }
 
-VesicleVolumeAreaPenalty::VesicleVolumeAreaPenalty(const InputParameters & parameters) :
-    Kernel(parameters),
+VesicleVolumeAreaPenalty::VesicleVolumeAreaPenalty(const InputParameters & parameters)
+  : Kernel(parameters),
     _alpha_v(getParam<Real>("alpha_v")),
     _alpha_a(getParam<Real>("alpha_a")),
-    _epsilon(getParam<Real>("epsilon")), 
+    _epsilon(getParam<Real>("epsilon")),
+    _rz(getParam<bool>("rz")),
     _second_phi(secondPhi()),
     _second_test(secondTest()),
     _second_u(second()),
@@ -52,9 +55,7 @@ VesicleVolumeAreaPenalty::VesicleVolumeAreaPenalty(const InputParameters & param
   _alpha_a0 = _alpha_a;
 }
 
-VesicleVolumeAreaPenalty::~VesicleVolumeAreaPenalty()
-{
-}
+VesicleVolumeAreaPenalty::~VesicleVolumeAreaPenalty() {}
 
 void
 VesicleVolumeAreaPenalty::timestepSetup()
@@ -64,21 +65,21 @@ VesicleVolumeAreaPenalty::timestepSetup()
     _volume_0 = _vesicle_volume;
     _area_0 = _vesicle_area;
   }
-  
-  if(_use_prescribed_volume)
+
+  if (_use_prescribed_volume)
   {
     _volume_0 = _prescribed_volume;
     if (_t_step <= 500)
-      _alpha_v = _alpha_v0/500 * _t_step;
+      _alpha_v = _alpha_v0 / 500 * _t_step;
     else
       _alpha_v = _alpha_v0;
   }
 
-  if(_use_prescribed_area)
+  if (_use_prescribed_area)
   {
     _area_0 = _prescribed_area;
     if (_t_step <= 500)
-      _alpha_a = _alpha_a0/500 * _t_step;
+      _alpha_a = _alpha_a0 / 500 * _t_step;
     else
       _alpha_a = _alpha_a0;
   }
@@ -94,8 +95,9 @@ VesicleVolumeAreaPenalty::jacobianSetup()
 void
 VesicleVolumeAreaPenalty::residualSetup()
 {
-  //std::cout << "volume = " << _volume << ", volume_0 = " << _volume_0 << ", diff = " << _volume - _volume_0 << std::endl;
-  //std::cout << "area = " << _area << ", area_0 = " << _area_0 << ", diff = " << _area - _area_0 << std::endl; 
+  // std::cout << "volume = " << _volume << ", volume_0 = " << _volume_0 << ", diff = " << _volume -
+  // _volume_0 << std::endl;  std::cout << "area = " << _area << ", area_0 = " << _area_0 << ", diff
+  // = " << _area - _area_0 << std::endl;
   _volume = _vesicle_volume;
   _area = _vesicle_area;
 }
@@ -107,17 +109,22 @@ VesicleVolumeAreaPenalty::computeQpResidual()
 
   Real rz_coord = _q_point[_qp](0);
 
+  Real lap_u = _second_u[_qp].tr();
+
+  if (_rz)
+    lap_u += _grad_u[_qp](0) / rz_coord;
+
   if (!_use_nonlocal_constraint)
   {
     r += -_alpha_v * _test[_i][_qp] * (_volume - _volume_0);
 
-    r += _alpha_a * _test[_i][_qp] * (_area - _area_0) * (-3.0/std::sqrt(2.0) * _epsilon * (_second_u[_qp].tr() + _grad_u[_qp](0)/rz_coord));
+    r += _alpha_a * _test[_i][_qp] * (_area - _area_0) * (-3.0 / std::sqrt(2.0) * _epsilon * lap_u);
   }
   else
   {
-    r += -_alpha_v * _test[_i][_qp] * (- _volume_0);
+    r += -_alpha_v * _test[_i][_qp] * (-_volume_0);
 
-    r += _alpha_a * _test[_i][_qp] * (- _area_0) * (-3.0/std::sqrt(2.0) * _epsilon * (_second_u[_qp].tr() + _grad_u[_qp](0)/rz_coord));
+    r += _alpha_a * _test[_i][_qp] * (-_area_0) * (-3.0 / std::sqrt(2.0) * _epsilon * lap_u);
   }
 
   return r;
@@ -130,8 +137,13 @@ VesicleVolumeAreaPenalty::computeQpJacobian()
 
   Real rz_coord = _q_point[_qp](0);
 
-  r += _alpha_a * _test[_i][_qp] * (_area - _area_0) * (-3.0/std::sqrt(2.0) * _epsilon * (_second_phi[_j][_qp].tr() + _grad_phi[_j][_qp](0)/rz_coord));
+  Real lap_phi_j = _second_phi[_j][_qp].tr();
+
+  if (_rz)
+    lap_phi_j += _grad_phi[_j][_qp](0) / rz_coord;
+
+  r += _alpha_a * _test[_i][_qp] * (_area - _area_0) *
+       (-3.0 / std::sqrt(2.0) * _epsilon * lap_phi_j);
 
   return r;
 }
-

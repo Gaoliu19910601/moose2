@@ -22,7 +22,7 @@
 
 class VesicleVolumeAreaPenalty;
 
-template<>
+template <>
 InputParameters validParams<VesicleVolumeAreaPenalty>();
 
 class VesicleVolumeAreaPenalty : public Kernel
@@ -33,7 +33,6 @@ public:
   virtual ~VesicleVolumeAreaPenalty();
 
 protected:
-
   virtual void timestepSetup();
 
   virtual void jacobianSetup();
@@ -49,6 +48,7 @@ protected:
   Real _alpha_a;
 
   Real _epsilon;
+  bool _rz;
 
   Real _volume, _volume_0;
   Real _area, _area_0;
@@ -71,8 +71,7 @@ protected:
 
   bool _use_nonlocal_constraint;
 
-  //const VesicleInitialAreaVolumeUO & _uo_initial_area_volume;
-
+  // const VesicleInitialAreaVolumeUO & _uo_initial_area_volume;
 };
 
 #endif /* VESICLEVOLUMEAREAPENALTY_H */

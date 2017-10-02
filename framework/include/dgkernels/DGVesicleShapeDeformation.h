@@ -17,10 +17,10 @@
 
 #include "DGKernel.h"
 
-//Forward Declarations
+// Forward Declarations
 class DGVesicleShapeDeformation;
 
-template<>
+template <>
 InputParameters validParams<DGVesicleShapeDeformation>();
 
 /**
@@ -34,6 +34,7 @@ public:
 protected:
   Real _eta;
   Real _epsilon;
+  bool _rz;
 
   const VariablePhiSecond & _second_phi;
   const VariableTestSecond & _second_test;
@@ -41,10 +42,9 @@ protected:
   const VariablePhiSecond & _second_phi_neighbor;
   const VariableTestSecond & _second_test_neighbor;
   const VariableSecond & _second_u_neighbor;
-   
+
   virtual Real computeQpResidual(Moose::DGResidualType type);
   virtual Real computeQpJacobian(Moose::DGJacobianType type);
-
 };
 
 #endif

@@ -19,7 +19,7 @@
 
 class VesicleShapeDeformation;
 
-template<>
+template <>
 InputParameters validParams<VesicleShapeDeformation>();
 
 class VesicleShapeDeformation : public Kernel
@@ -36,7 +36,8 @@ protected:
 
   Real _epsilon;
   Real _C;
- 
+  bool _rz;
+
   const VariablePhiSecond & _second_phi;
   const VariableTestSecond & _second_test;
   const VariableSecond & _second_u;
