@@ -59,7 +59,7 @@ VesicleVolumeAreaPenalty::~VesicleVolumeAreaPenalty()
 void
 VesicleVolumeAreaPenalty::timestepSetup()
 {
-  if (_t_step <= 2)
+  if (_t_step <= 4)
   {
     _volume_0 = _vesicle_volume;
     _area_0 = _vesicle_area;
@@ -94,7 +94,8 @@ VesicleVolumeAreaPenalty::jacobianSetup()
 void
 VesicleVolumeAreaPenalty::residualSetup()
 {
-  //std::cout << "_volume = " << _volume << ", volume_0 = " << _volume_0 << ", diff = " << _volume - _volume_0 << std::endl;
+  //std::cout << "volume = " << _volume << ", volume_0 = " << _volume_0 << ", diff = " << _volume - _volume_0 << std::endl;
+  //std::cout << "area = " << _area << ", area_0 = " << _area_0 << ", diff = " << _area - _area_0 << std::endl; 
   _volume = _vesicle_volume;
   _area = _vesicle_area;
 }

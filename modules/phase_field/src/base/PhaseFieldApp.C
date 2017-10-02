@@ -391,8 +391,6 @@ PhaseFieldApp::registerObjects(Factory & factory)
   registerKernel(SwitchingFunctionPenalty);
   registerKernel(VesicleShapeDeformation);
   registerKernel(VesicleVolumeAreaPenalty);
-  registerDeprecatedObjectName(AllenCahn, "ACParsed", "15/04/2016 00:00");
-  registerDeprecatedObjectName(CahnHilliard, "CHParsed", "11/01/2015 00:00");
 
   registerInitialCondition(BimodalInverseSuperellipsoidsIC);
   registerInitialCondition(BimodalSuperellipsoidsIC);

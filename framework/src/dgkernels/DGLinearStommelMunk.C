@@ -14,7 +14,7 @@
 
 #include "DGLinearStommelMunk.h"
 #include "NeighborMooseVariableInterface.h"
-
+#include "MooseVariable.h"
 #include <cmath>
 
 template<>

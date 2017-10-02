@@ -14,7 +14,7 @@
 
 #include "LSMDirichletBC.h"
 #include "Function.h"
-
+#include "MooseVariable.h"
 #include "libmesh/numeric_vector.h"
 
 #include <cmath>
