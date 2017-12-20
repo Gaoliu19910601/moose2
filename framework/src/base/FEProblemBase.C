@@ -1326,6 +1326,9 @@ FEProblemBase::reinitElemPhys(const Elem * elem,
   if (_has_nonlocal_coupling)
     _assembly[tid]->prepareNonlocal();
 
+  // WJ
+  return;
+
   if (_displaced_problem != NULL && (_reinit_displaced_elem))
   {
     _displaced_problem->reinitElemPhys(
@@ -1469,6 +1472,9 @@ FEProblemBase::reinitNeighborPhys(const Elem * neighbor,
   // Compute the values of each variable at the points
   _nl->reinitNeighborFace(neighbor, neighbor_side, 0, tid);
   _aux->reinitNeighborFace(neighbor, neighbor_side, 0, tid);
+
+  // WJ
+  return;
 
   // Do the same for the displaced problem
   if (_displaced_problem != NULL)
@@ -4694,8 +4700,9 @@ FEProblemBase::checkProblemIntegrity()
                   std::ostream_iterator<unsigned int>(extra_subdomain_ids, " "));
 
         mooseError("The following blocks from your input mesh do not contain an active material: " +
-                   extra_subdomain_ids.str() + "\nWhen ANY mesh block contains a Material object, "
-                                               "all blocks must contain a Material object.\n");
+                   extra_subdomain_ids.str() +
+                   "\nWhen ANY mesh block contains a Material object, "
+                   "all blocks must contain a Material object.\n");
       }
     }
 

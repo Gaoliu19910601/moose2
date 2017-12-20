@@ -102,6 +102,7 @@ XFEMCutElem2D::getCutPlaneOrigin(unsigned int plane_id, MeshBase * displaced_mes
 {
   Point orig(0.0, 0.0, 0.0);
   std::vector<std::vector<EFANode *>> cut_line_nodes;
+  unsigned int cut_edge = _efa_elem2d.getFragment(0)->getCutEdge();
   for (unsigned int i = 0; i < _efa_elem2d.getFragment(0)->numEdges(); ++i)
   {
     if (_efa_elem2d.getFragment(0)->isEdgeInterior(i))
@@ -112,10 +113,23 @@ XFEMCutElem2D::getCutPlaneOrigin(unsigned int plane_id, MeshBase * displaced_mes
       cut_line_nodes.push_back(node_line);
     }
   }
+
+  if (cut_line_nodes.size() == 0 && cut_edge > 0)
+  {
+    std::vector<EFANode *> node_line(2, NULL);
+    node_line[0] = _efa_elem2d.getFragmentEdge(0, cut_edge - 1)->getNode(0);
+    node_line[1] = _efa_elem2d.getFragmentEdge(0, cut_edge - 1)->getNode(1);
+    cut_line_nodes.push_back(node_line);
+  }
   if (cut_line_nodes.size() == 0)
     mooseError("no cut line found in this element");
   if (plane_id < cut_line_nodes.size()) // valid plane_id
-    orig = getNodeCoordinates(cut_line_nodes[plane_id][0], displaced_mesh);
+  {
+    orig = 0.5 * (getNodeCoordinates(cut_line_nodes[plane_id][0], displaced_mesh) +
+                  getNodeCoordinates(cut_line_nodes[plane_id][0], displaced_mesh));
+    Point normal = getCutPlaneNormal(plane_id, displaced_mesh);
+    orig += -normal * 1.0e-4;
+  }
   return orig;
 }
 
@@ -124,6 +138,7 @@ XFEMCutElem2D::getCutPlaneNormal(unsigned int plane_id, MeshBase * displaced_mes
 {
   Point normal(0.0, 0.0, 0.0);
   std::vector<std::vector<EFANode *>> cut_line_nodes;
+  unsigned int cut_edge = _efa_elem2d.getFragment(0)->getCutEdge();
   for (unsigned int i = 0; i < _efa_elem2d.getFragment(0)->numEdges(); ++i)
   {
     if (_efa_elem2d.getFragment(0)->isEdgeInterior(i))
@@ -133,6 +148,14 @@ XFEMCutElem2D::getCutPlaneNormal(unsigned int plane_id, MeshBase * displaced_mes
       node_line[1] = _efa_elem2d.getFragmentEdge(0, i)->getNode(1);
       cut_line_nodes.push_back(node_line);
     }
+  }
+
+  if (cut_line_nodes.size() == 0 && cut_edge > 0)
+  {
+    std::vector<EFANode *> node_line(2, NULL);
+    node_line[0] = _efa_elem2d.getFragmentEdge(0, cut_edge - 1)->getNode(0);
+    node_line[1] = _efa_elem2d.getFragmentEdge(0, cut_edge - 1)->getNode(1);
+    cut_line_nodes.push_back(node_line);
   }
   if (cut_line_nodes.size() == 0)
     mooseError("no cut line found in this element");
@@ -144,6 +167,8 @@ XFEMCutElem2D::getCutPlaneNormal(unsigned int plane_id, MeshBase * displaced_mes
     Real len = std::sqrt(cut_line.norm_sq());
     cut_line /= len;
     normal = Point(cut_line(1), -cut_line(0), 0.0);
+    // std::cout << "cut_line_p1 = " << cut_line_p1 << ", cut_line_p2" << cut_line_p2
+    //           << ", normal = " << normal << std::endl;
   }
   return normal;
 }
@@ -176,6 +201,7 @@ XFEMCutElem2D::getCrackTipOriginAndDirection(unsigned tip_id,
       }
     }
   }
+
   if (cut_line_nodes.size() == 0)
     mooseError("no cut line found in this element");
 
@@ -419,6 +445,7 @@ XFEMCutElem2D::getIntersectionInfo(unsigned int plane_id,
                                 // two ending points.(may have issues with double cuts case!)
 
   std::vector<std::vector<EFANode *>> cut_line_nodes;
+  unsigned int cut_edge = _efa_elem2d.getFragment(0)->getCutEdge();
   for (unsigned int i = 0; i < _efa_elem2d.getFragment(0)->numEdges(); ++i)
   {
     if (_efa_elem2d.getFragment(0)->isEdgeInterior(i))
@@ -429,6 +456,15 @@ XFEMCutElem2D::getIntersectionInfo(unsigned int plane_id,
       cut_line_nodes.push_back(node_line);
     }
   }
+
+  if (cut_line_nodes.size() == 0 && cut_edge > 0)
+  {
+    std::vector<EFANode *> node_line(2, NULL);
+    node_line[0] = _efa_elem2d.getFragmentEdge(0, cut_edge - 1)->getNode(0);
+    node_line[1] = _efa_elem2d.getFragmentEdge(0, cut_edge - 1)->getNode(1);
+    cut_line_nodes.push_back(node_line);
+  }
+
   if (cut_line_nodes.size() == 0)
     mooseError("No cut line found in this element");
 

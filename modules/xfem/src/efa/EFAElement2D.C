@@ -40,6 +40,8 @@ EFAElement2D::EFAElement2D(const EFAElement2D * from_elem, bool convert_to_local
 {
   if (convert_to_local)
   {
+    // std::cout << "cut edge = " << from_elem->getFragment(0)->getCutEdge() << std::endl;
+    //_cut_edge = from_elem->getFragment(0)->getCutEdge();
     // build local nodes from global nodes
     for (unsigned int i = 0; i < _num_nodes; ++i)
     {
@@ -226,6 +228,11 @@ EFAElement2D::isPartial() const
       }
     } // i
   }
+
+  // Cut along the edge
+  if (this->getFragment(0)->getCutEdge() > 0)
+    partial = true;
+
   return partial;
 }
 
@@ -930,9 +937,8 @@ EFAElement2D::fragmentSanityCheck(unsigned int n_old_frag_edges, unsigned int n_
   }
   else if (n_old_frag_cuts == 3)
   {
-    if (_fragments.size() != 3 ||
-        (_fragments[0]->numEdges() + _fragments[1]->numEdges() + _fragments[2]->numEdges()) !=
-            n_old_frag_edges + 9)
+    if (_fragments.size() != 3 || (_fragments[0]->numEdges() + _fragments[1]->numEdges() +
+                                   _fragments[2]->numEdges()) != n_old_frag_edges + 9)
       EFAError("Incorrect link size for element with 3 cuts");
   }
   else
@@ -1121,6 +1127,16 @@ EFAElement2D::createChild(const std::set<EFAElement *> & CrackTipElements,
 
       // get child element's fragments
       EFAFragment2D * new_frag = new EFAFragment2D(childElem, true, this, ichild);
+      for (unsigned int k = 0; k < new_frag->numEdges(); ++k)
+      {
+        if (new_frag->getEdge(k)->getNode(0)->category() ==
+                EFANode::N_CATEGORY_EMBEDDED_PERMANENT &&
+            new_frag->getEdge(k)->getNode(1)->category() == EFANode::N_CATEGORY_EMBEDDED_PERMANENT)
+          // std::cout << "k = " << k << ", node = " <<
+          // new_frag->getEdge(k)->getNode(0)->idCatString()
+          //           << std::endl;
+          new_frag->setCutEdge(k + 1);
+      }
       childElem->_fragments.push_back(new_frag);
 
       // get child element's edges

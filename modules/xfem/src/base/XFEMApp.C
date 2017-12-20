@@ -23,8 +23,11 @@
 #include "XFEMAction.h"
 #include "XFEMSingleVariableConstraint.h"
 #include "XFEMPressure.h"
-#include "StatefulMaterialJump.h"
+#include "MaximumNormalSeparation.h"
+#include "MaximumNormalSeparation3D.h"
 #include "XFEMSingleVariableConstraintStatefulTest.h"
+#include "XFEMCohesiveConstraint.h"
+#include "XFEMCohesiveConstraint3D.h"
 
 #include "GeometricCutUserObject.h"
 #include "LineSegmentCutUserObject.h"
@@ -91,6 +94,8 @@ XFEMApp::registerObjects(Factory & factory)
   // Constraints
   registerConstraint(XFEMSingleVariableConstraint);
   registerConstraint(XFEMSingleVariableConstraintStatefulTest);
+  registerConstraint(XFEMCohesiveConstraint);
+  registerConstraint(XFEMCohesiveConstraint3D);
 
   // UserObjects
   registerUserObject(XFEMMarkerUserObject);
@@ -110,7 +115,8 @@ XFEMApp::registerObjects(Factory & factory)
   registerDiracKernel(XFEMPressure);
 
   // Material
-  registerMaterial(StatefulMaterialJump);
+  registerMaterial(MaximumNormalSeparation);
+  registerMaterial(MaximumNormalSeparation3D);
 }
 
 void

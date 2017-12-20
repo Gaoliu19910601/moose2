@@ -1007,9 +1007,32 @@ XFEM::cutMeshWithEFA(NonlinearSystemBase & nl, AuxiliarySystem & aux)
         it->second = libmesh_elem;
     }
 
+    std::cout << "new_elements[" << i << "] = " << new_elements[i]->id()
+              << ", parent id = " << new_elements[i]->getParent()->id()
+              << ", number children = " << new_elements[i]->getParent()->numChildren() << std::endl;
+
     // parent has at least two children
     if (new_elements[i]->getParent()->numChildren() > 1)
       temporary_parent_children_map[parent_id].push_back(libmesh_elem);
+    else if (new_elements[i]->getParent()->numChildren() == 1)
+    {
+      Elem * parent_new_elem = _mesh->elem(new_elements[i]->getParent()->id());
+      unsigned int cut_edge =
+          (dynamic_cast<EFAElement2D *>(new_elements[i]))->getFragment(0)->getCutEdge();
+      bool found = false;
+
+      Elem * neighbor = parent_new_elem->neighbor(cut_edge - 1);
+      if (neighbor != nullptr)
+      {
+        if (temporary_parent_children_map.find(neighbor->id()) !=
+                temporary_parent_children_map.end() &&
+            temporary_parent_children_map[neighbor->id()].size() == 1)
+        {
+          temporary_parent_children_map[neighbor->id()].push_back(libmesh_elem);
+          found = true;
+        }
+      }
+    }
 
     Elem * parent_elem2 = NULL;
     Elem * libmesh_elem2 = NULL;
@@ -1244,11 +1267,16 @@ XFEM::cutMeshWithEFA(NonlinearSystemBase & nl, AuxiliarySystem & aux)
        it != temporary_parent_children_map.end();
        ++it)
   {
-    std::vector<const Elem *> & sibling_elem_vec = it->second;
-    // TODO: for cut-node case, how to find the sibling elements?
-    // if (sibling_elem_vec.size() != 2)
-    // mooseError("Must have exactly 2 sibling elements");
-    _sibling_elems.push_back(std::make_pair(sibling_elem_vec[0], sibling_elem_vec[1]));
+    if ((it->second).size() > 1)
+    {
+      std::vector<const Elem *> & sibling_elem_vec = it->second;
+      // TODO: for cut-node case, how to find the sibling elements?
+      // if (sibling_elem_vec.size() != 2)
+      // mooseError("Must have exactly 2 sibling elements");
+      _sibling_elems.push_back(std::make_pair(sibling_elem_vec[0], sibling_elem_vec[1]));
+      // std::cout << "sibling 1 = " << *sibling_elem_vec[0]
+      //           << ", sibling 2 = " << *sibling_elem_vec[1] << std::endl;
+    }
   }
 
   // add sibling elems on displaced mesh
@@ -1353,6 +1381,7 @@ XFEM::getCutPlane(const Elem * elem,
   Point planedata(0.0, 0.0, 0.0);
   std::map<unique_id_type, XFEMCutElem *>::const_iterator it;
   it = _cut_elem_map.find(elem->unique_id());
+
   if (it != _cut_elem_map.end())
   {
     const XFEMCutElem * xfce = it->second;
@@ -1373,6 +1402,8 @@ XFEM::getCutPlane(const Elem * elem,
       }
       else
         mooseError("In get_cut_plane index out of range");
+
+      // std::cout << "index = " << (unsigned int)quantity << ", comp = " << comp << std::endl;
     }
   }
   return comp;
